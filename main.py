@@ -63,7 +63,8 @@ def main():
         else:
             print("Movimento inválido. Tente novamente.")
 
-    print("* * * * * Parabéns você ganhou! * * * * *")
+    if(slidingPuzzle.won):
+        print("* * * * * Parabéns você ganhou! * * * * *")
 
 if __name__ == "__main__":
     main()
