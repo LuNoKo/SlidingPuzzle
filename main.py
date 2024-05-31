@@ -1,15 +1,21 @@
 from collections import deque
+import time
+import statistics
+import matplotlib.pyplot as plt
 
 class SlidingPuzzle:
-    def __init__(self):
-        # Solicita ao usuário a configuração inicial do quebra-cabeça
-        initialPositionInput = input("Digite um conjunto de 9 números para posição inicial ou 'enter' para utilziar a default (213804756): ")
-
-        # Verifica se é valida
-        if  len(initialPositionInput) == 9:
-            self.puzzle = [int(char) for char in initialPositionInput]
+    def __init__(self, initial_puzzle=None):
+        if initial_puzzle:
+            self.puzzle = initial_puzzle
         else:
-            self.puzzle = [2, 1, 3, 8, 0, 4, 7, 5, 6]
+            # Solicita ao usuário a configuração inicial do quebra-cabeça
+            initialPositionInput = input("Digite um conjunto de 9 números para posição inicial ou 'enter' para utilizar a default (213804756): ")
+
+            # Verifica se é valida
+            if  len(initialPositionInput) == 9:
+                self.puzzle = [int(char) for char in initialPositionInput]
+            else:
+                self.puzzle = [2, 1, 3, 8, 0, 4, 7, 5, 6]
 
         self.size = 3  # Define o tamanho do quebra-cabeça (3x3)
         self.empty_pos = self.puzzle.index(0)  # Localiza a posição do espaço vazio (0)
@@ -37,13 +43,10 @@ class SlidingPuzzle:
                 self.empty_pos += 1
 
     def checkIfSolved(self, moves):
-        if(self.puzzle == [1, 2, 3, 8, 0, 4, 7, 6, 5]):
+        if self.puzzle == [1, 2, 3, 8, 0, 4, 7, 6, 5]:
             self.solved = True
-
-            print("\n* * * * * Solucionado! * * * * *")
-            print("\nMovimentos para a solução:", moves)
-            print("\nEstado final:")
-            self.display()
+            return True
+        return False
 
     def display(self):
         # A função display() imprime o estado atual do quebra-cabeça na tela linha por linha
@@ -66,6 +69,11 @@ class SlidingPuzzle:
                 moves.append(directionInput)
                 self.move(directionInput)
                 self.checkIfSolved(moves)
+                if self.checkIfSolved(moves):
+                    print("\n* * * * * Solucionado! * * * * *")
+                    print("\nMovimentos para a solução:", moves)
+                    print("\nEstado final:")
+                    self.display()
             else:
                 print("\nMovimento inválido. Tente novamente.")
 
@@ -79,9 +87,8 @@ class SlidingPuzzle:
             self.empty_pos = self.puzzle.index(0)  # Atualiza a posição do espaço vazio
 
             # Verifica foi resolvido
-            self.checkIfSolved(moves)
-            if self.solved:
-                break
+            if self.checkIfSolved(moves):
+                return moves
 
             visited.add(tuple(self.puzzle))  # Adiciona o estado atual aos estados visitados
 
@@ -103,10 +110,11 @@ class SlidingPuzzle:
                 if tuple(new_state) not in visited:  # Verifica se o novo estado não foi visitado antes
                     queue.append((new_state, moves + [move]))  # Adiciona o novo estado à fila com os movimentos até ele
 
+        # Caso não seja resolvido, encerra a execução
         if not self.solved:
             print("\n* * * * * Não foi possível encontrar uma solução * * * * *")
 
-    def bestFirsSearch(self): # Busca pela melhor escolha - Com informação
+    def bestFirstSearch(self): # Busca pela melhor escolha - Com informação
         queue = [(self.puzzle, [])]  # Inicializa a fila com o estado inicial e uma lista vazia de movimentos
         visited = set()  # Conjunto para armazenar os estados visitados
 
@@ -117,9 +125,8 @@ class SlidingPuzzle:
             self.empty_pos = self.puzzle.index(0)  # Atualiza a posição do espaço vazio
 
             # Verifica foi resolvido
-            self.checkIfSolved(moves)
-            if self.solved:
-                break
+            if self.checkIfSolved(moves):
+                return moves
 
             visited.add(tuple(self.puzzle))  # Adiciona o estado atual aos estados visitados
 
@@ -166,18 +173,70 @@ class SlidingPuzzle:
             print("2 - Busca em largura (amplitude) - Sem informação")
             print("3 - Busca pela melhor escolha - Sem informação (Ainda não desenvolvido)")
             print("4 - Sair")
+            print("5 - Testes")
             resolutionMethod = input("Informe o método de resolução: ")
 
+            # Avalia o método de resolução e direciona os fluxos
             if resolutionMethod == '1':
                 self.manual()
             elif resolutionMethod == '2':
-                self.breadthFirstSearch()
+                start = time.time()
+                moves = self.breadthFirstSearch()
+                end = time.time()
+                if moves:
+                    print("\n* * * * * Solucionado! * * * * *")
+                    print("\nMovimentos para a solução: ", moves)
+                    print("\nEstado final:")
+                    self.display()
+                else:
+                    print("\n* * * * * Não foi possível encontrar uma solução * * * * *")
+                print("\nTempo para resolução: " + f"{(end - start):.3f}" + "s")
             elif resolutionMethod == '3':
-                self.bestFirsSearch()
+                start = time.time()
+                moves = self.bestFirstSearch()
+                end = time.time()
+                if moves:
+                    print("\n* * * * * Solucionado! * * * * *")
+                    print("\nMovimentos para a solução: ", moves)
+                    print("\nEstado final:")
+                    self.display()
+                else:
+                    print("\n* * * * * Não foi possível encontrar uma solução * * * * *")
+                print("\nTempo para resolução: " + f"{(end - start):.3f}" + "s")
             elif resolutionMethod == '4':
                 break
+            elif resolutionMethod == '5':
+                test_solver()
             else:
                 print("\nMétodo inválido, tente novamente")
+
+def test_solver(runs=10):
+    initial_puzzle = [2, 1, 3, 8, 0, 4, 7, 5, 6]
+    bfs_times = []
+    best_times = []
+
+    for _ in range(runs):
+        sp_bfs = SlidingPuzzle(initial_puzzle)
+        start = time.time()
+        sp_bfs.breadthFirstSearch()
+        end = time.time()
+        bfs_times.append(end - start)
+
+        sp_best = SlidingPuzzle(initial_puzzle)
+        start = time.time()
+        sp_best.bestFirstSearch()
+        end = time.time()
+        best_times.append(end - start)
+
+    print("\nBreadth-First Search Times (s):")
+    print(f"Quickest: {min(bfs_times):.3f}")
+    print(f"Median: {statistics.median(bfs_times):.3f}")
+    print(f"Longest: {max(bfs_times):.3f}")
+
+    print("\nBest-First Search Times (s):")
+    print(f"Quickest: {min(best_times):.3f}")
+    print(f"Median: {statistics.median(best_times):.3f}")
+    print(f"Longest: {max(best_times):.3f}")
 
 def main():
     # Inicia uma instancia de SlidingPuzzle
