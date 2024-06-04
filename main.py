@@ -1,7 +1,6 @@
 from collections import deque
 import time
 import statistics
-import matplotlib.pyplot as plt
 
 class SlidingPuzzle:
     def __init__(self, initial_puzzle=None):
@@ -171,7 +170,7 @@ class SlidingPuzzle:
             print("\nMétodos de resolução:")
             print("1 - Manual")
             print("2 - Busca em largura (amplitude) - Sem informação")
-            print("3 - Busca pela melhor escolha - Sem informação (Ainda não desenvolvido)")
+            print("3 - Busca pela melhor escolha - Com informação")
             print("4 - Sair")
             print("5 - Testes")
             resolutionMethod = input("Informe o método de resolução: ")
@@ -210,33 +209,47 @@ class SlidingPuzzle:
             else:
                 print("\nMétodo inválido, tente novamente")
 
-def test_solver(runs=10):
-    initial_puzzle = [2, 1, 3, 8, 0, 4, 7, 5, 6]
+def test_solver():
+    initial_puzzles = [
+        [2, 1, 3, 8, 0, 4, 7, 5, 6],
+        [1, 2, 3, 8, 0, 4, 7, 6, 5],
+        [1, 2, 3, 8, 4, 0, 7, 6, 5],
+        [0, 1, 3, 8, 2, 4, 7, 6, 5],
+        [1, 2, 3, 0, 8, 4, 7, 6, 5],
+        [1, 0, 3, 8, 2, 4, 7, 6, 5],
+        [1, 2, 3, 8, 6, 4, 7, 0, 5],
+        [2, 8, 3, 1, 6, 4, 7, 5, 0],
+        [2, 4, 8, 6, 1, 0, 5, 7, 3],
+        [2, 8, 3, 1, 6, 4, 7, 0, 5]
+    ]
+
     bfs_times = []
     best_times = []
 
-    for _ in range(runs):
+    for initial_puzzle in initial_puzzles:
         sp_bfs = SlidingPuzzle(initial_puzzle)
         start = time.time()
         sp_bfs.breadthFirstSearch()
+        time.sleep(1)
         end = time.time()
-        bfs_times.append(end - start)
+        bfs_times.append((end - 1) - start)
 
         sp_best = SlidingPuzzle(initial_puzzle)
         start = time.time()
         sp_best.bestFirstSearch()
+        time.sleep(1)
         end = time.time()
-        best_times.append(end - start)
+        best_times.append((end - 1) - start)
 
     print("\nBreadth-First Search Times (s):")
-    print(f"Quickest: {min(bfs_times):.3f}")
-    print(f"Median: {statistics.median(bfs_times):.3f}")
-    print(f"Longest: {max(bfs_times):.3f}")
+    print(f"Quickest: {min(bfs_times)}")
+    print(f"Median: {statistics.median(bfs_times)}")
+    print(f"Longest: {max(bfs_times)}")
 
     print("\nBest-First Search Times (s):")
-    print(f"Quickest: {min(best_times):.3f}")
-    print(f"Median: {statistics.median(best_times):.3f}")
-    print(f"Longest: {max(best_times):.3f}")
+    print(f"Quickest: {min(best_times)}")
+    print(f"Median: {statistics.median(best_times)}")
+    print(f"Longest: {max(best_times)}")
 
 def main():
     # Inicia uma instancia de SlidingPuzzle
