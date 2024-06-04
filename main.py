@@ -162,6 +162,48 @@ class SlidingPuzzle:
                     distance += abs(i - target_row) + abs(j - target_col)  # Calcula a Distância Manhattan
         return distance
 
+    def test_solver(self):
+        initial_puzzles = [
+            [2, 1, 3, 8, 0, 4, 7, 5, 6],
+            [1, 2, 3, 8, 0, 4, 7, 6, 5],
+            [1, 2, 3, 8, 4, 0, 7, 6, 5],
+            [0, 1, 3, 8, 2, 4, 7, 6, 5],
+            [1, 2, 3, 0, 8, 4, 7, 6, 5],
+            [1, 0, 3, 8, 2, 4, 7, 6, 5],
+            [1, 2, 3, 8, 6, 4, 7, 0, 5],
+            [2, 8, 3, 1, 6, 4, 7, 5, 0],
+            [2, 4, 8, 6, 1, 0, 5, 7, 3],
+            [2, 8, 3, 1, 6, 4, 7, 0, 5]
+        ]
+
+        bfs_times = []
+        best_times = []
+
+        for initial_puzzle in initial_puzzles:
+            sp_bfs = SlidingPuzzle(initial_puzzle)
+            start = time.time()
+            sp_bfs.breadthFirstSearch()
+            time.sleep(1)
+            end = time.time()
+            bfs_times.append((end - 1) - start)
+
+            sp_best = SlidingPuzzle(initial_puzzle)
+            start = time.time()
+            sp_best.bestFirstSearch()
+            time.sleep(1)
+            end = time.time()
+            best_times.append((end - 1) - start)
+
+        print("\nBreadth-First Search Times (s):")
+        print(f"Quickest: {min(bfs_times)}")
+        print(f"Median: {statistics.median(bfs_times)}")
+        print(f"Longest: {max(bfs_times)}")
+
+        print("\nBest-First Search Times (s):")
+        print(f"Quickest: {min(best_times)}")
+        print(f"Median: {statistics.median(best_times)}")
+        print(f"Longest: {max(best_times)}")
+
     def mainResolutionMethods(self):
         # Controla o fluxo do jogo,, entra em um loop onde exibe os métodos para resolver o quebra-cabeça
         # Ao escolher um método direciona a execução para a função que resolve com o método selecionado
@@ -205,51 +247,9 @@ class SlidingPuzzle:
             elif resolutionMethod == '4':
                 break
             elif resolutionMethod == '5':
-                test_solver()
+                self.test_solver()
             else:
                 print("\nMétodo inválido, tente novamente")
-
-def test_solver():
-    initial_puzzles = [
-        [2, 1, 3, 8, 0, 4, 7, 5, 6],
-        [1, 2, 3, 8, 0, 4, 7, 6, 5],
-        [1, 2, 3, 8, 4, 0, 7, 6, 5],
-        [0, 1, 3, 8, 2, 4, 7, 6, 5],
-        [1, 2, 3, 0, 8, 4, 7, 6, 5],
-        [1, 0, 3, 8, 2, 4, 7, 6, 5],
-        [1, 2, 3, 8, 6, 4, 7, 0, 5],
-        [2, 8, 3, 1, 6, 4, 7, 5, 0],
-        [2, 4, 8, 6, 1, 0, 5, 7, 3],
-        [2, 8, 3, 1, 6, 4, 7, 0, 5]
-    ]
-
-    bfs_times = []
-    best_times = []
-
-    for initial_puzzle in initial_puzzles:
-        sp_bfs = SlidingPuzzle(initial_puzzle)
-        start = time.time()
-        sp_bfs.breadthFirstSearch()
-        time.sleep(1)
-        end = time.time()
-        bfs_times.append((end - 1) - start)
-
-        sp_best = SlidingPuzzle(initial_puzzle)
-        start = time.time()
-        sp_best.bestFirstSearch()
-        time.sleep(1)
-        end = time.time()
-        best_times.append((end - 1) - start)
-
-    print("\nBreadth-First Search Times (s):")
-    print(f"Quickest: {min(bfs_times)}")
-    print(f"Median: {statistics.median(bfs_times)}")
-    print(f"Longest: {max(bfs_times)}")
-
-    print("\nBest-First Search Times (s):")
-    print(f"Quickest: {min(best_times)}")
-    print(f"Median: {statistics.median(best_times)}")
-    print(f"Longest: {max(best_times)}")
 
 def main():
     # Inicia uma instancia de SlidingPuzzle
